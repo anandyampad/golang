@@ -5,7 +5,6 @@ import "fmt"
 func main() {
 
 	var greet1 func()
-
 	greet1 = func() { //greet1 := func() {
 		fmt.Println("Hi there!")
 	}

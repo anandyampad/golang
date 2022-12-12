@@ -6,30 +6,32 @@ func main() {
 
 	for {
 		userchoice := ReadUserChoice()
-
-		switch userchoice {
-		case 1:
-			x, y := ReadOperands()
-			fmt.Printf("Result = %d\n", Add(x, y))
-		case 2:
-			x, y := ReadOperands()
-			fmt.Printf("Result = %d\n", Subtract(x, y))
-		case 3:
-			x, y := ReadOperands()
-			fmt.Printf("Result = %d\n", Multiply(x, y))
-		case 4:
-			x, y := ReadOperands()
-			q, r := Divide(x, y)
-			fmt.Printf("Quotient = %d Remainder = %d \n", q, r)
-		case 5:
-			fmt.Println("Thank you")
-		default:
-			fmt.Println("Invalid Choice, Try again")
-		}
-
+		DoOperations(userchoice)
 		if userchoice == 5 {
 			break
 		}
+	}
+}
+
+func DoOperations(userchoice int) {
+	switch userchoice {
+	case 1:
+		x, y := ReadOperands()
+		fmt.Printf("Result = %d\n", Add(x, y))
+	case 2:
+		x, y := ReadOperands()
+		fmt.Printf("Result = %d\n", Subtract(x, y))
+	case 3:
+		x, y := ReadOperands()
+		fmt.Printf("Result = %d\n", Multiply(x, y))
+	case 4:
+		x, y := ReadOperands()
+		q, r := Divide(x, y)
+		fmt.Printf("Quotient = %d Remainder = %d \n", q, r)
+	case 5:
+		fmt.Println("Thank you")
+	default:
+		fmt.Println("Invalid Choice, Try again")
 	}
 }
 
