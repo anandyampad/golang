@@ -39,7 +39,7 @@ func ReadUserChoice() int {
 	var choice int
 	fmt.Println("1. Add\n2. Subtract\n3. Multiply\n4. Divide\n5. Exit")
 	fmt.Print("Enter your chocie:")
-	fmt.Scanf("%d", &choice)
+	fmt.Scan(&choice)
 	fmt.Println()
 	return choice
 }
@@ -47,7 +47,7 @@ func ReadUserChoice() int {
 func ReadOperands() (int, int) {
 	var x, y int
 	fmt.Println("Enter two numbers seperated by space")
-	fmt.Scanf("%d%d", &x, &y)
+	fmt.Scan(&x, &y)
 	return x, y
 }
 
