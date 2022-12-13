@@ -8,7 +8,7 @@ the main function receives the prime nos and prints them
 */
 
 func main() {
-	primes := genPrime(2, 11)
+	primes := genPrime(1, 5)
 	fmt.Println(primes)
 }
 
@@ -23,7 +23,7 @@ func genPrime(start, end int) []int {
 }
 
 func isPrime(num int) bool {
-	for i := 2; i < num/2; i++ {
+	for i := 2; i <= num/2; i++ {
 		if num%i == 0 {
 			return false
 		}
