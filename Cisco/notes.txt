@@ -10,3 +10,6 @@ _______________
 
 copy one slice another pointer and len got copied
 if you add more values to one slice others wont impact
+
+
+what is abstraction?
