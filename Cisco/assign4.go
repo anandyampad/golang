@@ -15,6 +15,8 @@ func main() {
 
 	values := strings.Split(str, " ")
 
+	count := 0
+	myAns := ""
 	mymap := make(map[string]int)
 	for _, val := range values {
 		if _, exist := mymap[val]; exist {
@@ -22,16 +24,11 @@ func main() {
 		} else {
 			mymap[val] = 1
 		}
-	}
-
-	size := 0
-	mykey := ""
-	for key, value := range mymap {
-		if value > size {
-			mykey = key
-			size = value
+		if mymap[val] > count {
+			myAns = val
+			count = mymap[val]
 		}
 	}
 
-	fmt.Println(mykey, size)
+	fmt.Printf("%d letter word occured %d times\n", len(myAns), count)
 }
