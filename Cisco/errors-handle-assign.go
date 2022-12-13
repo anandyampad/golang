@@ -78,7 +78,7 @@ func Multiply(x, y int) int {
 	return x * y
 }
 
-func Divide(x, y int) (q int, r int, err error) {
+func Divide(x, y int) (q, r int, err error) {
 	if y == 0 {
 		err = errors.New("Divide by Zero error!")
 		return
