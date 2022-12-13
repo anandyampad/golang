@@ -1,0 +1,12 @@
+go run -gcflags = "-m" <filename.go> //to analyse heap escaping 
+
+slice is a pointer to underlying array
+it will work as copy by reference(not value)
+
+slice
+_______________
+|pointer | len |
+|--------|-----|
+
+copy one slice another pointer and len got copied
+if you add more values to one slice others wont impact
