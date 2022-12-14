@@ -12,4 +12,13 @@ copy one slice another pointer and len got copied
 if you add more values to one slice others wont impact
 
 
-what is abstraction?
+Node is optimized for IO - Single threaded event loop model
+Go can be optimized for io and cpu intensive
+
+
+htop is used to know info about current processors and threads
+
+make can be used 
+    slice
+    map
+    channel
