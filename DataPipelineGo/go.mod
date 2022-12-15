@@ -1,3 +1,3 @@
-module github.com/anandyampad/golang/DataPipelineGo
+module github.com/anandyampad/golang/datapipelinego
 
 go 1.19
