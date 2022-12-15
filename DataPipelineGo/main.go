@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -133,4 +134,11 @@ func WriteToFile(oddsum, evensum int) {
 		log.Fatal(len, err)
 	}
 	f.Sync()
+}
+
+func TestModule(name string) string {
+	sb := strings.Builder{}
+	sb.WriteString("Hello")
+	sb.WriteString(" " + name + "! Welcome to Go Modules!")
+	return sb.String()
 }
