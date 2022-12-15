@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"sort"
+	"strings"
 )
 
 type Product struct {
@@ -14,11 +15,20 @@ type Product struct {
 	Category string
 }
 
-func (p Product) Format() string {
-	return fmt.Sprintf("Id=%d, Name=%s, Cost=%v, Units=%d, Category=%s", p.Id, p.Name, p.Cost, p.Units, p.Category)
+func (p Product) String() string {
+	return fmt.Sprintf("Id=%d, Name=%s, Cost=%v, Units=%d, Category=%s",
+		p.Id, p.Name, p.Cost, p.Units, p.Category)
 }
 
 type Products []Product
+
+func (products Products) String() string {
+	sb := strings.Builder{}
+	for _, p := range products {
+		sb.WriteString(fmt.Sprintf("%s\n", p.String()))
+	}
+	return sb.String()
+}
 
 /*
 Write the apis for the following
@@ -29,7 +39,7 @@ IndexOf => return the index of the given product
 
 	ex:  returns the index of the given product
 */
-func (products Products)IndexOf(product Product) (int, error) {
+func (products Products) IndexOf(product Product) (int, error) {
 	for i, val := range products {
 		if val == product {
 			return i, nil
@@ -64,55 +74,13 @@ Filter => return a new collection of products that satisfy the given condition
 		etc
 */
 
-/*
-type Specification interface {
-	IsSatisfied(product *Product) bool
-}
+type Predicate func(product Product) bool
 
-type CostSpecification struct {
-	Cost float32
-}
-
-func (c CostSpecification) IsSatisfied(product *Product) bool {
-	if product.Cost > c.Cost {
-		return true
-	} else {
-		return false
-	}
-}
-
-type CategorySpecification struct {
-	Category string
-}
-
-func (c CategorySpecification) IsSatisfied(product *Product) bool {
-	if product.Category == c.Category {
-		return true
-	} else {
-		return false
-	}
-}
-
-type CostAndCategorySpecification struct {
-	Cost     float32
-	Category string
-}
-
-func (cc CostAndCategorySpecification) IsSatisfied(product *Product) bool {
-	if (product.Cost > cc.Cost) && (product.Category == cc.Category) {
-		return true
-	} else {
-		return false
-	}
-}
-*/
-
-type Predicate func(product Product)bool
-func Filter(products Products)(predicate Predicate) []Product {
-	result := make([]Product, 0)
-	for _, value := range products {
-		if predicate(&value) {
-			result = append(result, value)
+func (products Products) Filter(predicate Predicate) Products {
+	result := make(Products, 0)
+	for _, product := range products {
+		if predicate(product) {
+			result = append(result, product)
 		}
 	}
 	return result
@@ -127,9 +95,9 @@ func Filter(products Products)(predicate Predicate) []Product {
 			etc
 */
 
-func (products Products)Any(predicate Predicate) bool {
-	for _, v := range products {
-		if predicate(&v) {
+func (products Products) Any(predicate Predicate) bool {
+	for _, product := range products {
+		if predicate(product) {
 			return true
 		}
 	}
@@ -145,9 +113,9 @@ func (products Products)Any(predicate Predicate) bool {
 			etc
 */
 
-func (products Products)All(predicate Predicate) bool {
-	for _, v := range products {
-		if !Predicate(&v) {
+func (products Products) All(predicate Predicate) bool {
+	for _, product := range products {
+		if !predicate(product) {
 			return false
 		}
 	}
@@ -167,25 +135,34 @@ func (products Products)All(predicate Predicate) bool {
 
 */
 
-
-type SortProducts interface{
-	
-}
-
-
+// By Id
 func (p Products) Len() int           { return len(p) }
 func (p Products) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
-func (p Products) Less(i, j int) bool { return p[i].Id< p[j].Id }
+func (p Products) Less(i, j int) bool { return p[i].Id < p[j].Id }
 
-
-type ByCost struct{
+// By Cost
+type ByCost struct {
 	Products
 }
 
-func (p ByCost) Less(i, j int) bool { return p[i].Cost< p[j].Cost }
+func (p ByCost) Less(i, j int) bool { return p.Products[i].Cost < p.Products[j].Cost }
+
+// By Name
+type ByName struct {
+	Products
+}
+
+func (p ByName) Less(i, j int) bool { return p.Products[i].Name < p.Products[j].Name }
+
+// By Units
+type ByUnits struct {
+	Products
+}
+
+func (p ByUnits) Less(i, j int) bool { return p.Products[i].Units < p.Products[j].Units }
 
 func main() {
-	products := []Product{
+	products := Products{
 		Product{105, "Pen", 5, 50, "Stationary"},
 		Product{107, "Pencil", 2, 100, "Stationary"},
 		Product{103, "Marker", 50, 20, "Utencil"},
@@ -197,7 +174,7 @@ func main() {
 
 	//IndexOf
 	PencilProduct := Product{107, "Pencil", 2, 100, "Stationary"}
-	index, err := IndexOf(products, PencilProduct)
+	index, err := products.IndexOf(PencilProduct)
 	if err != nil {
 		fmt.Println(err)
 	} else {
@@ -206,7 +183,7 @@ func main() {
 
 	//Includes
 	StoveProduct := Product{102, "Stove", 5000, 5, "Utencil"}
-	includes := Includes(products, StoveProduct)
+	includes := products.Includes(StoveProduct)
 	if includes {
 		fmt.Println("Stove Product is included")
 	} else {
@@ -214,64 +191,77 @@ func main() {
 	}
 
 	//Filter
-	costSpec := CostSpecification{1000}
-	costlyProducts := Filter(products, costSpec)
-
 	fmt.Println("\nProducts with Cost > 1000:")
+	costlyProductPredicate := func(product Product) bool {
+		if product.Cost > 1000 {
+			return true
+		} else {
+			return false
+		}
+	}
+	costlyProducts := products.Filter(costlyProductPredicate)
 	fmt.Println(costlyProducts)
 
-	categorySpec := CategorySpecification{"Stationary"}
-	StationaryProducts := Filter(products, categorySpec)
-
 	fmt.Println("\nProducts with Stationary Category:")
+	StationaryProductsPredicate := func(product Product) bool {
+		if product.Category == "Stationary" {
+			return true
+		} else {
+			return false
+		}
+	}
+
+	StationaryProducts := products.Filter(StationaryProductsPredicate)
 	fmt.Println(StationaryProducts)
 
-	costAndCategorySpec := CostAndCategorySpecification{1000, "Stationary"}
-	CostlyStationaryProducts := Filter(products, costAndCategorySpec)
-
 	fmt.Println("\nProducts with Cost > 1000 and having Stationary Category:")
+	CostlyStationaryProductsPredicate := func(product Product) bool {
+		if StationaryProductsPredicate(product) && costlyProductPredicate(product) {
+			return true
+		} else {
+			return false
+		}
+	}
+
+	CostlyStationaryProducts := products.Filter(CostlyStationaryProductsPredicate)
 	fmt.Println(CostlyStationaryProducts)
 
 	//Any
-	anyCostlyProducts := Any(products, costSpec)
+	anyCostlyProducts := products.Any(costlyProductPredicate)
 	fmt.Print("\nAre there any costly(>1000) Products:")
 	fmt.Println(anyCostlyProducts)
 
-	anyStationaryProducts := Any(products, categorySpec)
+	anyStationaryProducts := products.Any(StationaryProductsPredicate)
 	fmt.Print("\nAre there any Stationary Products:")
 	fmt.Println(anyStationaryProducts)
 
-	anyCostlyStationaryProducts := Any(products, costAndCategorySpec)
+	anyCostlyStationaryProducts := products.Any(CostlyStationaryProductsPredicate)
 	fmt.Print("\nAre there any Costly Stationary Products:")
 	fmt.Println(anyCostlyStationaryProducts)
 
 	// All
-	allCostlyProducts := All(products, costSpec)
+	allCostlyProducts := products.All(costlyProductPredicate)
 	fmt.Print("\nAre there all costly(>1000) Products:")
 	fmt.Println(allCostlyProducts)
 
-	allStationaryProducts := All(products, categorySpec)
+	allStationaryProducts := products.All(StationaryProductsPredicate)
 	fmt.Print("\nAre there all Stationary Products:")
 	fmt.Println(allStationaryProducts)
 
-	allCostlyStationaryProducts := All(products, costAndCategorySpec)
+	allCostlyStationaryProducts := products.All(CostlyStationaryProductsPredicate)
 	fmt.Print("\nAre there all Costly Stationary Products:")
 	fmt.Println(allCostlyStationaryProducts)
 
 	//Sort
-	sort.Sort(ByCost(products))
-	fmt.Println("After sorting by Cost")
-
+	sort.Sort(ByCost{products})
+	fmt.Println("\nAfter sorting by Cost")
 	fmt.Println(products)
 
-	sort.Sort(ByName(products))
-	fmt.Println("After sorting by Name")
-
+	sort.Sort(ByName{products})
+	fmt.Println("\nAfter sorting by Name")
 	fmt.Println(products)
 
-	sort.Sort(ByUnits(products))
-	fmt.Println("After sorting by Units")
-
+	sort.Sort(ByUnits{products})
+	fmt.Println("\nAfter sorting by Units")
 	fmt.Println(products)
-
 }
